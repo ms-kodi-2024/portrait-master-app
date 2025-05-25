@@ -57,7 +57,7 @@ const SubmitPhotoForm = () => {
 
     if(!photo.file) error = 'You have to select an image';
     else if(!photo.title.length || !photo.author.length || !photo.email.length) error = `You can't leave title and author fields empty`;
-    else if(photo.title.length > 50) error = `Title can't be longer than 25 characters`;
+    else if(photo.title.length > 25) error = `Title can't be longer than 25 characters`;
 
     if(!error) {
       const formData = new FormData();
@@ -76,10 +76,10 @@ const SubmitPhotoForm = () => {
 
   return (
     <Form onSubmit={submitForm} className="animated fadeInRight">
-      { (request && request.success) && <Alert className="standard-box" color="success">Your photo has been successfully submitted!</Alert> }
+      { (request?.success) && <Alert className="standard-box" color="success">Your photo has been successfully submitted!</Alert> }
       { (error) && <Alert className="standard-box" color="danger" toggle={clearError}>{ error }</Alert> }
-      { (request && request.pending) && <Spinner color="primary" className="standard-box d-block ms-auto me-auto" /> }
-      { (!request || !request.success) &&
+      { (request?.pending) && <Spinner color="primary" className="standard-box d-block ms-auto me-auto" /> }
+      { (!request?.success) &&
         (
           <Row>
             <Col xs="12" md="6" className="order-2 order-md-1">
@@ -89,7 +89,7 @@ const SubmitPhotoForm = () => {
               </FormGroup>
               <FormGroup>
                 <Label for="photoAuthor">Author</Label>
-                <Input id="photoAuthor" type="text" name="author" onChange={handleChange} placeholder="Type your title here" required />
+                <Input id="photoAuthor" type="text" name="author" maxLength="50" onChange={handleChange} placeholder="Type your title here" required />
               </FormGroup>
               <FormGroup>
                 <Label for="authorEmail">Author e-mail</Label>
@@ -101,7 +101,14 @@ const SubmitPhotoForm = () => {
                   I agree with the <Link to="/terms-of-use">terms of use</Link>
                 </Label>
               </FormGroup>
-              <Button color="primary" size="lg" className="btn-pill mt-4">Submit your work!</Button>
+              <Button
+                color="primary"
+                size="lg"
+                className="btn-pill mt-4"
+                disabled={request?.pending || !photo.file}
+              >
+                Submit your work!
+              </Button>
             </Col>
             <Col xs="12" md="6" className="order-1 order-md-2">
               <ImageUploader
@@ -117,7 +124,6 @@ const SubmitPhotoForm = () => {
                   isDragging,
                   dragProps,
                 }) => (
-                  // write your building UI
                   <div className="border border-dashed rounded h-full h-100 position-relative">
                     <a
                       className={clsx(
